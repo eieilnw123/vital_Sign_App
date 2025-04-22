@@ -1,0 +1,293 @@
+﻿@page
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@model VitalSignApp.Pages.VitalSignsModel
+@{
+    ViewData["Title"] = "Vital Signs (View + Update)";
+}
+
+<h1>Vital Signs (View + Update)</h1>
+
+<!-- ตารางแสดง VitalSigns -->
+<table class="table table-bordered" id="vitalSignTable">
+    <thead>
+        <tr>
+            <th>HN</th>
+            <th>Systolic</th>
+            <th>Diastolic</th>
+            <th>Pulse</th>
+            <th>SpO2</th>
+            <th>Resp Rate</th>
+            <th>Height</th>
+            <th>Weight</th>
+            <th>BMI</th>
+            <th>Temp</th>
+            <th>RecordedAt</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vs in Model.VitalSigns)
+        {
+            <tr style="cursor: pointer;"
+                onclick="openEditModal(
+                    '@vs.Hn',
+                    @vs.Systolic,
+                    @vs.Diastolic,
+                    @vs.Pulse,
+                    @vs.Sp02,
+                    @vs.RespiratoryRate,
+                    @vs.Height,
+                    @vs.Weight,
+                    @vs.Bmi,
+                    @vs.Temp
+                )">
+                <td>@vs.Hn</td>
+                <td>@vs.Systolic</td>
+                <td>@vs.Diastolic</td>
+                <td>@vs.Pulse</td>
+                <td>@vs.Sp02</td>
+                <td>@vs.RespiratoryRate</td>
+                <td>@vs.Height</td>
+                <td>@vs.Weight</td>
+                <td>@vs.Bmi</td>
+                <td>@vs.Temp</td>
+                <td>@vs.RecordedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<nav>
+    <ul class="pagination">
+        @if (Model.CurrentPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?currentPage=@(Model.CurrentPage - 1)">Previous</a>
+            </li>
+        }
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                <a class="page-link" href="?currentPage=@i">@i</a>
+            </li>
+        }
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?currentPage=@(Model.CurrentPage + 1)">Next</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+<!-- Modal แก้ไข -->
+<div class="modal fade" id="editVitalSignModal" tabindex="-1" aria-labelledby="editVitalSignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editVitalSignModalLabel">Edit Vital Sign</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editVitalSignForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">HN</label>
+                        <input type="text" class="form-control" name="Hn" id="editHn" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Systolic</label>
+                        <input type="number" class="form-control" name="Systolic" id="editSystolic" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Diastolic</label>
+                        <input type="number" class="form-control" name="Diastolic" id="editDiastolic" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pulse</label>
+                        <input type="number" class="form-control" name="Pulse" id="editPulse" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">SpO2</label>
+                        <input type="number" class="form-control" name="Sp02" id="editSp02" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">RespiratoryRate</label>
+                        <input type="number" class="form-control" name="RespiratoryRate" id="editRR" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Height</label>
+                        <input type="number" class="form-control" name="Height" id="editHeight" step="0.01" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Weight</label>
+                        <input type="number" class="form-control" name="Weight" id="editWeight" step="0.01" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Bmi</label>
+                        <input type="number" class="form-control" name="Bmi" id="editBmi" step="0.01" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Temp</label>
+                        <input type="number" class="form-control" name="temp" id="editTemp" step="0.1" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveEdit()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Bootstrap 5 JS + Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 1) เพิ่มไลบรารี SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <script>
+        // ============================================
+        // A) สร้าง connection ไปยัง Hub
+        // ============================================
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(HubUrl, { withCredentials: false })
+            .build();
+
+        // ============================================
+        // B) ฟัง event "ReceiveVitalSignUpdate"
+        //    - ใช้สำหรับกรณีมีการ Add ใหม่
+        // ============================================
+        connection.on("ReceiveVitalSignUpdate", function(newVitalSign) {
+            console.log("New VitalSign added:", newVitalSign);
+
+            // สร้างแถวใหม่ในตาราง
+            const tbody = document.querySelector("#vitalSignTable tbody");
+            const newRow = document.createElement("tr");
+
+            // onclick แถว เพื่อเปิด Modal (ถ้าต้องการ)
+            newRow.style.cursor = "pointer";
+            newRow.onclick = function() {
+                openEditModal(
+                    newVitalSign.hn,
+                    newVitalSign.systolic,
+                    newVitalSign.diastolic,
+                    newVitalSign.pulse,
+                    newVitalSign.sp02,
+                    newVitalSign.respiratoryRate,
+                    newVitalSign.height,
+                    newVitalSign.weight,
+                    newVitalSign.bmi,
+                    newVitalSign.temp
+                );
+            };
+
+            // สร้าง innerHTML
+            const recordedTime = new Date(newVitalSign.recordedAt).toLocaleString();
+            newRow.innerHTML = `
+                        <td>${newVitalSign.hn}</td>
+                        <td>${newVitalSign.systolic}</td>
+                        <td>${newVitalSign.diastolic}</td>
+                        <td>${newVitalSign.pulse}</td>
+                        <td>${newVitalSign.sp02}</td>
+                        <td>${newVitalSign.respiratoryRate}</td>
+                        <td>${newVitalSign.height}</td>
+                        <td>${newVitalSign.weight}</td>
+                        <td>${newVitalSign.bmi}</td>
+                        <td>${newVitalSign.temp}</td>
+                        <td>${recordedTime}</td>
+                    `;
+            // จะใส่ appendChild หรือ prepend ก็ได้
+            // prepend เพื่อให้รายการใหม่มาอยู่บนสุด
+            tbody.prepend(newRow);
+        });
+
+        // ============================================
+        // C) ฟัง event "ReceiveVitalSignEdit" (optional)
+        //    - ถ้าต้องการ Real-time เมื่อแก้ไข
+        // ============================================
+        connection.on("ReceiveVitalSignEdit", function(updatedVitalSign) {
+            console.log("Updated VitalSign:", updatedVitalSign);
+            console.log("SignalR connected!");
+            // หาแถวเดิมที่มี HN ตรงกัน
+            const rows = document.querySelectorAll("#vitalSignTable tbody tr");
+            for (const row of rows) {
+                const hnCell = row.children[0]; // คอลัมน์แรก HN
+                if (hnCell && hnCell.innerText === updatedVitalSign.hn) {
+                    // update คอลัมน์
+                    row.children[1].innerText = updatedVitalSign.systolic;
+                    row.children[2].innerText = updatedVitalSign.diastolic;
+                    row.children[3].innerText = updatedVitalSign.pulse;
+                    row.children[4].innerText = updatedVitalSign.sp02;
+                    row.children[5].innerText = updatedVitalSign.respiratoryRate;
+                    row.children[6].innerText = updatedVitalSign.height;
+                    row.children[7].innerText = updatedVitalSign.weight;
+                    row.children[8].innerText = updatedVitalSign.bmi;
+                    row.children[9].innerText = updatedVitalSign.temp;
+                    row.children[10].innerText = new Date(updatedVitalSign.recordedAt).toLocaleString();
+                    break;
+                }
+            }
+        });
+
+        // ============================================
+        // D) เริ่มเชื่อมต่อ
+        // ============================================
+        connection.start()
+            .then(() => {
+                console.log("SignalR connected!");
+            })
+            .catch(err => console.error("SignalR connect error:", err));
+
+        // ============================================
+        // E) ฟังก์ชันเปิด Modal (ใส่ค่าเดิม)
+        // ============================================
+        function openEditModal(hn, systolic, diastolic, pulse, sp02, rr, height, weight, bmi, temp) {
+            document.getElementById("editHn").value = hn;
+            document.getElementById("editSystolic").value = systolic;
+            document.getElementById("editDiastolic").value = diastolic;
+            document.getElementById("editPulse").value = pulse;
+            document.getElementById("editSp02").value = sp02;
+            document.getElementById("editRR").value = rr;
+            document.getElementById("editHeight").value = height;
+            document.getElementById("editWeight").value = weight;
+            document.getElementById("editBmi").value = bmi;
+            document.getElementById("editTemp").value = temp;
+
+            var modal = new bootstrap.Modal(document.getElementById('editVitalSignModal'));
+            modal.show();
+        }
+
+        // ============================================
+        // F) ฟังก์ชันกดปุ่ม Save -> ส่ง Update
+        // ============================================
+        function saveEdit() {
+            let formElem = document.getElementById("editVitalSignForm");
+            let formData = new FormData(formElem);
+
+            fetch("?handler=UpdateVitalSign", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Vital Sign updated successfully!");
+                        // ปิด Modal
+                        var modalEl = document.getElementById('editVitalSignModal');
+                        var modal = bootstrap.Modal.getInstance(modalEl);
+                        modal.hide();
+
+                        // ถ้าอยากให้ Real-time Edit โดยไม่ reload
+                        // ฝั่ง Server ควร broadcast -> "ReceiveVitalSignEdit" -> อัปเดต DOM ด้านบน
+                        // หรือหาก reload ก็จะเห็นผลเหมือนกัน
+                        location.reload();
+                    } else {
+                        alert("Failed to update Vital Sign.");
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+}

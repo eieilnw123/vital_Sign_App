@@ -1,0 +1,172 @@
+﻿@page
+@model VitalSignApp.Pages.StatsModel
+@{
+    ViewData["Title"] = "สถิติผู้ป่วย";
+}
+
+<style>
+    /* ปรับ Container หลัก */
+    .main-container {
+        min-height: 100vh;
+        padding: 20px;
+        overflow-x: hidden; /* ป้องกันเลื่อนแนวนอน */
+    }
+
+    /* การ์ดสถิติ */
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        height: 100%;
+    }
+
+        .stat-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .display-4 {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+    /* กราฟ */
+    .chart-wrapper {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    /* Responsive Adjustments */
+    @@media (max-width: 768px) {
+        .stat-card .display-4 {
+            font-size: 2rem;
+        }
+
+        .stat-card h3 {
+            font-size: 1.1rem;
+        }
+
+        .chart-wrapper {
+            padding: 1rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .main-container {
+            padding: 10px;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+            .stat-card .display-4 {
+                font-size: 1.8rem;
+            }
+    }
+</style>
+
+<div class="main-container">
+    <div class="container-fluid">
+        <!-- หัวข้อหลัก -->
+        <h1 class="text-center mb-4 text-primary fw-bold">📊 สถิติผู้ป่วย</h1>
+
+        <!-- การ์ดสถิติ -->
+        <div class="row g-3">
+            <div class="col-12 col-md-4">
+                <div class="stat-card bg-primary text-white">
+                    <h3>🕒 วันนี้</h3>
+                    <div class="display-4">@Model.TodayCount</div>
+                    <small>ราย</small>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="stat-card bg-success text-white">
+                    <h3>📅 สัปดาห์นี้</h3>
+                    <div class="display-4">@Model.ThisWeekCount</div>
+                    <small>ราย</small>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="stat-card bg-danger text-white">
+                    <h3>🗓️ เดือนนี้</h3>
+                    <div class="display-4">@Model.ThisMonthCount</div>
+                    <small>ราย</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- กราฟ -->
+        <div class="chart-wrapper">
+            <h4 class="mb-3 text-center">📈 สถิติรายชั่วโมง (วันนี้)</h4>
+            <div style="position: relative; height: 300px">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('hourlyChart');
+        const labels = @Html.Raw(Json.Serialize(Model.HourlyData.Keys));
+        const data = @Html.Raw(Json.Serialize(Model.HourlyData.Values));
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'จำนวนผู้ป่วย',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            color: '#666'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#666',
+                        
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

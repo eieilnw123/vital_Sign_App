@@ -1,0 +1,9 @@
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\VitalSignApp.exe
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\appsettings.Development.json
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\appsettings.json
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\VitalSignApp.dll
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\VitalSignApp.deps.json
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\VitalSignApp.runtimeconfig.json
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\VitalSignApp.pdb
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\Newtonsoft.Json.dll
+D:\Project\VitalSignApp\VitalSignApp\obj\Release\net8.0\PubTmp\Out\System.Net.WebSockets.WebSocketProtocol.dll
