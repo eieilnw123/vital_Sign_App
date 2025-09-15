@@ -1,0 +1,212 @@
+﻿@page
+@model VitalSignApp.Pages.MercuryFormModel
+@{
+    ViewData["Title"] = "ฟอร์มปรอท";
+}
+
+<style>
+    body {
+        background-color: #f4f7fa;
+    }
+
+    .dashboard-container {
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 40vh; /* ความสูง 40% ของหน้าจอ */
+        margin-top: 20px;
+    }
+
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+    }
+
+    th, td {
+        padding: 12px 8px;
+        border: 1px solid #e0e0e0;
+        white-space: nowrap;
+    }
+
+    th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+</style>
+
+<div class="dashboard-container">
+
+    <h2 class="text-primary">ฟอร์มปรอท (Vital Signs)</h2>
+    <p>กรุณากรอก HN ของผู้ป่วยเพื่อดูข้อมูล</p>
+    <form method="get">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="ค้นหา HN..." name="SearchHn" value="@Model.SearchHn" autofocus>
+            <button class="btn btn-primary" type="submit">ค้นหา</button>
+        </div>
+    </form>
+
+    @if (Model.VitalSignsData.Any())
+    {
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 class="mb-0">ผลการค้นหาสำหรับ HN: @Model.SearchHn</h4>
+            <div class="d-flex align-items-center gap-2">
+                <label for="startDatePicker" class="form-label mb-0">ตั้งแต่:</label>
+                <input type="date" id="startDatePicker" class="form-control form-control-sm" style="width: auto;">
+                <label for="endDatePicker" class="form-label mb-0">ถึง:</label>
+                <input type="date" id="endDatePicker" class="form-control form-control-sm" style="width: auto;">
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="vitalSignsChart"></canvas>
+        </div>
+
+        <div class="table-container">
+            <table class="table table-bordered table-striped">
+                <tbody id="vitals-table-body"></tbody>
+                <thead id="vitals-table-head"></thead>
+            </table>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Model.SearchHn))
+    {
+        <div class="alert alert-warning mt-3" role="alert">
+            ไม่พบข้อมูลสำหรับ HN: <strong>@Model.SearchHn</strong>
+        </div>
+    }
+
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // รับข้อมูลจาก C# PageModel
+        const allPatientData = @Html.Raw(Model.ChartDataJson);
+        let myChart = null;
+
+        // --- Functions to create chart and table ---
+        function populateTable(data) {
+            const tableHead = document.getElementById('vitals-table-head');
+            const tableBody = document.getElementById('vitals-table-body');
+
+            if (!tableHead || !tableBody) return;
+
+            if (data.length === 0) {
+                tableHead.innerHTML = '';
+                tableBody.innerHTML = '<tr><td colspan="100%">ไม่พบข้อมูลในช่วงวันที่ที่เลือก</td></tr>';
+                return;
+            }
+
+            const dataFields = {
+                'Respiration': 'respiration',
+                'Systolic': 'systolic',
+                'Diastolic': 'diastolic',
+                'SpO2': 'spo2'
+            };
+
+            // Create Header
+            let headerHtml = '<tr><th>ค่า</th>';
+            data.forEach(d => {
+                const date = new Date(d.time);
+                headerHtml += `<th>${date.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' })}<br>${date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.</th>`;
+            });
+            headerHtml += '</tr>';
+            tableHead.innerHTML = headerHtml;
+
+            // Create Body
+            let bodyHtml = '';
+            for (const [displayName, key] of Object.entries(dataFields)) {
+                bodyHtml += `<tr><td><strong>${displayName}</strong></td>`;
+                data.forEach(d => {
+                    bodyHtml += `<td>${d[key] || '-'}</td>`;
+                });
+                bodyHtml += '</tr>';
+            }
+            tableBody.innerHTML = bodyHtml;
+        }
+
+        function createChart(data) {
+            if (myChart) {
+                myChart.destroy();
+            }
+            const canvas = document.getElementById('vitalSignsChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const labels = data.map(d => {
+                const date = new Date(d.time);
+                return `${date.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' })} ${date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+            });
+            const pulseData = data.map(d => d.pulse);
+            const tempData = data.map(d => d.temp);
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'ชีพจร', data: pulseData, borderColor: '#3498db', yAxisID: 'yPulse', tension: 0.1, pointRadius: 4, pointHoverRadius: 6 },
+                        { label: 'อุณหภูมิ', data: tempData, borderColor: '#e74c3c', yAxisID: 'yTemp', tension: 0.1, pointRadius: 4, pointHoverRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { autoSkip: true, maxTicksLimit: 20 } },
+                        yPulse: { position: 'left', title: { display: true, text: 'ชีพจร (bpm)' } },
+                        yTemp: { position: 'right', title: { display: true, text: 'อุณหภูมิ (°C)' }, grid: { drawOnChartArea: false } }
+                    }
+                }
+            });
+        }
+
+        function updateDashboard(startDate, endDate) {
+            const filteredData = allPatientData.filter(d => {
+                const itemDate = d.time.split(' ')[0]; // YYYY-MM-DD
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            populateTable(filteredData);
+            createChart(filteredData);
+        }
+
+        // --- Run on page load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if (allPatientData.length === 0) return;
+
+            const startDatePicker = document.getElementById('startDatePicker');
+            const endDatePicker = document.getElementById('endDatePicker');
+
+            const toYYYYMMDD = (date) => date.toISOString().split('T')[0];
+
+            // Set default dates from the first and last data points
+            const firstDate = new Date(allPatientData[0].time);
+            const lastDate = new Date(allPatientData[allPatientData.length - 1].time);
+
+            startDatePicker.value = toYYYYMMDD(firstDate);
+            endDatePicker.value = toYYYYMMDD(lastDate);
+
+            // Initial render with full data range
+            updateDashboard(startDatePicker.value, endDatePicker.value);
+
+            // Add event listeners to filter data when dates change
+            const handleDateChange = () => {
+                updateDashboard(startDatePicker.value, endDatePicker.value);
+            };
+            startDatePicker.addEventListener('change', handleDateChange);
+            endDatePicker.addEventListener('change', handleDateChange);
+        });
+    </script>
+}

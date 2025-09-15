@@ -12,8 +12,8 @@ namespace VitalSignApp
             // Register HttpClient เพื่อใช้เรียกข้อมูลจาก API
             builder.Services.AddHttpClient("VitalSignApi", client =>
             {
-                client.BaseAddress = new Uri("http://localhost:55/api/"); // URL ของ API
-                //client.BaseAddress = new Uri("https://localhost:44367/api/"); // URL ของ API TEST
+               client.BaseAddress = new Uri("http://localhost:56/api/"); // URL ของ API
+               // client.BaseAddress = new Uri("https://localhost:44367/api/"); // URL ของ API TEST
             });
 
 

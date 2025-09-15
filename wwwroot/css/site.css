@@ -20,3 +20,483 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.risk-low {
+    background-color: #d4edda;
+    color: green;
+    font-weight: bold;
+}
+
+.risk-medium {
+    background-color: #fff3cd;
+    color: #856404;
+    font-weight: bold;
+}
+
+.risk-high {
+    background-color: #f8d7da;
+    color: red;
+    font-weight: bold;
+}
+#vitalSignTable {
+
+}
+
+    #vitalSignTable th,
+    #vitalSignTable td {
+        vertical-align: middle;
+        padding: 8px 12px;
+        font-size: 20px;
+    }
+.pagination-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 10px;
+}
+
+/* pagination.css - Enhanced Pagination Styles */
+
+/* Main Container */
+.pagination-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+    border: 1px solid #e9ecef;
+}
+
+/* Pagination Info Section */
+.pagination-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pagination-stats {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+    .pagination-stats i {
+        color: #007bff;
+    }
+
+/* Pagination Controls */
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+    .pagination-controls label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0;
+    }
+
+.page-size-select {
+    min-width: 80px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+    .page-size-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+/* Jump to Page */
+.jump-to-page {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.jump-input {
+    width: 70px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+    .jump-input:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .jump-input.is-invalid {
+        border-color: #dc3545;
+        animation: shake 0.5s;
+    }
+
+@keyframes shake {
+    0%, 20%, 40%, 60%, 80% {
+        transform: translateX(-2px);
+    }
+
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(2px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Enhanced Pagination */
+.pagination-enhanced {
+    justify-content: center;
+    margin: 1.5rem 0 0 0;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+    .pagination-enhanced .page-item {
+        margin: 0 2px;
+    }
+
+    .pagination-enhanced .page-link {
+        border: 1px solid #dee2e6;
+        color: #495057;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .pagination-enhanced .page-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .pagination-enhanced .page-link:hover::before {
+            left: 100%;
+        }
+
+        .pagination-enhanced .page-link:hover {
+            background-color: #e9ecef;
+            border-color: #adb5bd;
+            color: #495057;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+    .pagination-enhanced .page-item.active .page-link {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border-color: #007bff;
+        color: white;
+        box-shadow: 0 3px 8px rgba(0, 123, 255, 0.3);
+        transform: translateY(-1px);
+        font-weight: 600;
+    }
+
+        .pagination-enhanced .page-item.active .page-link:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: translateY(-1px);
+        }
+
+    .pagination-enhanced .page-item.disabled .page-link {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #adb5bd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Navigation Buttons */
+.nav-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+    .nav-button:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        color: #495057;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+
+    .nav-button.disabled {
+        background: #f8f9fa;
+        color: #adb5bd;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+        .nav-button.disabled:hover {
+            background: #f8f9fa;
+            color: #adb5bd;
+            transform: none;
+            box-shadow: none;
+        }
+
+    .nav-button i {
+        font-size: 0.9rem;
+    }
+
+/* Page Ellipsis */
+.page-ellipsis {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+    cursor: default;
+}
+
+/* Risk Color Classes */
+.risk-low {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.risk-medium {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.risk-high {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+/* Loading State */
+.pagination-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+    .pagination-loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+/* Button Enhancements */
+.btn i {
+    margin-right: 0.25rem;
+}
+
+.btn-success:hover i,
+.btn-primary:hover i,
+.btn-secondary:hover i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+/* Table Enhancements */
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 1rem 0.75rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.table tbody td {
+    vertical-align: middle;
+    padding: 0.75rem;
+    border-color: #e9ecef;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .pagination-enhanced .page-link {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-button {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .pagination-container {
+        padding: 1.25rem;
+    }
+
+    .pagination-info {
+        gap: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .pagination-info {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .pagination-controls {
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .pagination-enhanced {
+        gap: 0.1rem;
+    }
+
+        .pagination-enhanced .page-link {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+            min-width: 36px;
+        }
+
+    .nav-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+    }
+
+        .nav-button span {
+            display: none;
+        }
+
+    .pagination-container {
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    .jump-to-page {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .jump-input {
+        width: 80px;
+    }
+}
+
+@media (max-width: 576px) {
+    .pagination-enhanced .page-link {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.8rem;
+        min-width: 32px;
+    }
+
+    .nav-button {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .page-size-select,
+    .jump-input {
+        font-size: 0.85rem;
+    }
+
+    .pagination-stats {
+        font-size: 0.8rem;
+    }
+
+    .pagination-controls label {
+        font-size: 0.85rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .pagination-container {
+        display: none;
+    }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    .pagination-container {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .pagination-stats {
+        color: #a0aec0;
+    }
+
+    .pagination-enhanced .page-link {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+        .pagination-enhanced .page-link:hover {
+            background: #4a5568;
+            border-color: #718096;
+        }
+
+    .nav-button {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+}

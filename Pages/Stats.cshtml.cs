@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using VitalSignApp.Services;
 using VitalSignApp.Models;
 using System.Globalization;
@@ -27,19 +27,32 @@ namespace VitalSignApp.Pages
             var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
             var startOfMonth = new DateTime(today.Year, today.Month, 1);
 
-            TodayCount = allData.Count(v => v.RecordedAt.Date == today);
-            ThisWeekCount = allData.Count(v => v.RecordedAt >= startOfWeek);
-            ThisMonthCount = allData.Count(v => v.RecordedAt >= startOfMonth);
+            // กรองข้อมูลที่ RecordedAt มีค่าจริงๆ ออกมาก่อน
+            var recordedDates = allData
+                .Where(v => v.RecordedAt.HasValue)
+                .Select(v => v.RecordedAt!.Value) // แปลงเป็น DateTime ปลอดภัยแล้ว
+                .ToList();
 
-            // Group by hour for today
-            HourlyData = allData
-                .Where(v => v.RecordedAt.Date == today)
-                .GroupBy(v => v.RecordedAt.Hour)
+            // นับจำนวนข้อมูลวันนี้
+            TodayCount = recordedDates.Count(d => d.Date == today);
+
+            // นับจำนวนข้อมูลสัปดาห์นี้
+            ThisWeekCount = recordedDates.Count(d => d.Date >= startOfWeek);
+
+            // นับจำนวนข้อมูลเดือนนี้
+            ThisMonthCount = recordedDates.Count(d => d.Date >= startOfMonth);
+
+            // Group ข้อมูลรายชั่วโมง (เฉพาะข้อมูลวันนี้)
+            HourlyData = recordedDates
+                .Where(d => d.Date == today)
+                .GroupBy(d => d.Hour)
                 .OrderBy(g => g.Key)
                 .ToDictionary(
-                    g => $"{g.Key:00}:00-{g.Key:00}:59",
+                    g => $"{g.Key:00}:00-{g.Key:00}:59", // เช่น 09:00-09:59
                     g => g.Count()
                 );
         }
+
+
     }
 }
